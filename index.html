@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PesisirCerdas – Prototipe Pemindai Sampah Pesisir</title>
+<meta name="description" content="Prototipe simulasi PesisirCerdas: pindai foto pantai, kenali sampah plastik dan nonplastik, lalu catat wilayahnya.">
+<style>
+:root{
+  --bg:#F8F9FA;--surface:#fff;--text:#12283a;--muted:#4b6272;--border:#d5e2ea;
+  --sea:#0077B6;--onsea:#fff;--plastic:#F77F00;--non:#1f7a6f;--warn:#b85f00;
+  color-scheme:light}
+@media (prefers-color-scheme:dark){:root{
+  --bg:#0c1a24;--surface:#12293a;--text:#e8f1f6;--muted:#9fb6c4;--border:#25455a;
+  --sea:#4db3e6;--onsea:#06202f;--non:#5fd0c2;--warn:#ffa94d;color-scheme:dark}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:"Segoe UI",system-ui,-apple-system,Roboto,sans-serif;line-height:1.55}
+header{padding:1rem 1.25rem;border-bottom:1px solid var(--border);background:var(--surface);display:flex;flex-wrap:wrap;align-items:center;gap:.5rem 1rem;justify-content:space-between}
+.brand{font-weight:800;font-size:1.2rem;color:var(--sea)}
+.tag{font-size:.78rem;font-weight:700;padding:.15rem .6rem;border:1px solid var(--warn);color:var(--warn);border-radius:99px;margin-left:.5rem}
+.slogan{color:var(--muted);font-size:.95rem}
+main{max-width:960px;margin:0 auto;padding:1.25rem}
+h2{font-size:1.25rem;margin:0 0 .6rem}
+.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:.5rem;list-style:none;padding:0;margin:0 0 1.25rem;counter-reset:s}
+.steps li{counter-increment:s;border:1px solid var(--border);background:var(--surface);border-radius:10px;padding:.5rem .6rem;font-size:.82rem;color:var(--muted);font-weight:600}
+.steps li::before{content:counter(s) ". "}
+.steps li.on{border-color:var(--sea);color:var(--text)}
+.steps li.done{background:var(--sea);border-color:var(--sea);color:var(--onsea)}
+@media(max-width:560px){.steps{grid-template-columns:1fr 1fr}}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:1rem;margin-bottom:1.25rem}
+#scene{width:100%;height:auto;display:block;border-radius:10px;border:1px solid var(--border)}
+.box rect.f{fill:none;stroke-width:3}
+.box{opacity:0;transition:opacity .35s}.box.on{opacity:1}
+.row{display:flex;flex-wrap:wrap;gap:.6rem;margin-top:.9rem;align-items:center}
+button,.btn{font:inherit;font-weight:700;border:0;border-radius:10px;padding:.7rem 1.2rem;cursor:pointer;background:var(--sea);color:var(--onsea)}
+button.cta{background:var(--plastic);color:#1a1000}
+button.ghost{background:transparent;color:var(--sea);border:2px solid var(--sea)}
+button.danger{background:transparent;color:var(--warn);border:2px solid var(--warn)}
