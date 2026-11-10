@@ -28,11 +28,267 @@ h2{font-size:1.25rem;margin:0 0 .6rem}
 .steps li.done{background:var(--sea);border-color:var(--sea);color:var(--onsea)}
 @media(max-width:560px){.steps{grid-template-columns:1fr 1fr}}
 .card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:1rem;margin-bottom:1.25rem}
-#scene{width:100%;height:auto;display:block;border-radius:10px;border:1px solid var(--border)}
-.box rect.f{fill:none;stroke-width:3}
+#scene{width:100%;height:auto;display:block;border-radius:10px;border:1px solid var(--border);background:#222}
+.box rect.f{fill:none;stroke-width:4}
 .box{opacity:0;transition:opacity .35s}.box.on{opacity:1}
 .row{display:flex;flex-wrap:wrap;gap:.6rem;margin-top:.9rem;align-items:center}
 button,.btn{font:inherit;font-weight:700;border:0;border-radius:10px;padding:.7rem 1.2rem;cursor:pointer;background:var(--sea);color:var(--onsea)}
 button.cta{background:var(--plastic);color:#1a1000}
 button.ghost{background:transparent;color:var(--sea);border:2px solid var(--sea)}
 button.danger{background:transparent;color:var(--warn);border:2px solid var(--warn)}
+button:disabled{opacity:.5;cursor:not-allowed}
+button:focus-visible,input:focus-visible,textarea:focus-visible{outline:3px solid var(--plastic);outline-offset:2px}
+.status{font-weight:600;margin-top:.6rem;min-height:1.5em}
+.counts{display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin:.5rem 0 1rem}
+.count{border-radius:12px;padding:.8rem 1rem;border:2px solid}
+.count.p{border-color:var(--plastic)}.count.n{border-color:var(--non)}
+.count b{display:block;font-size:2rem;line-height:1.1}
+ul.items{list-style:none;padding:0;margin:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:.4rem}
+ul.items li{font-size:.92rem}
+.dot{display:inline-block;width:.7rem;height:.7rem;border-radius:50%;margin-right:.45rem}
+.dot.p{background:var(--plastic)}.dot.n{background:var(--non)}
+label{display:block;font-weight:600;margin:.7rem 0 .25rem}
+input[type=text],textarea{width:100%;font:inherit;padding:.6rem .7rem;border-radius:10px;border:1px solid var(--border);background:var(--bg);color:var(--text)}
+.note{font-size:.85rem;color:var(--muted)}
+.tw{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:.9rem;min-width:560px}
+th,td{text-align:left;padding:.5rem .55rem;border-bottom:1px solid var(--border);vertical-align:top}
+.empty{color:var(--muted);padding:.5rem 0}
+.hidden{display:none}
+footer{max-width:960px;margin:0 auto;padding:0 1.25rem 2rem}
+@media(prefers-reduced-motion:reduce){.box{transition:none}}
+</style>
+</head>
+<body>
+<header>
+  <div><span class="brand">🌊 PesisirCerdas</span><span class="tag">Prototipe</span></div>
+  <div class="slogan">Kenali. Pilah. Jaga Pesisir.</div>
+</header>
+
+<main>
+  <ol class="steps" id="steps" aria-label="Alur penggunaan">
+    <li class="on">Foto pantai</li><li>Pindai</li><li>Terdeteksi</li><li>Catat wilayah</li>
+  </ol>
+
+  <section class="card" aria-labelledby="h1">
+    <h2 id="h1">1. Foto pantai yang kotor</h2>
+    <svg id="scene" viewBox="0 0 1408 768" role="img" aria-label="Foto pantai yang dipenuhi sampah plastik dan nonplastik">
+      <image href="pantai.jpg" x="0" y="0" width="1408" height="768" preserveAspectRatio="xMidYMid slice"/>
+      <g id="boxes"></g>
+      <rect id="scan" class="hidden" x="0" y="0" width="6" height="768" fill="#4db3e6" opacity=".9"/>
+      <rect x="0" y="728" width="400" height="40" fill="#000" opacity=".55"/>
+      <text x="14" y="755" font-size="22" fill="#fff" font-family="sans-serif">Tampilan prototipe (simulasi)</text>
+    </svg>
+    <div class="row">
+      <button id="scanBtn" class="cta">Pindai</button>
+      <button id="resetBtn" class="ghost">Ulangi</button>
+    </div>
+    <div class="status" id="status" aria-live="polite">Tekan Pindai untuk memulai simulasi deteksi.</div>
+  </section>
+
+  <section class="card hidden" id="result" aria-labelledby="h3">
+    <h2 id="h3">3. Terdeteksi (simulasi)</h2>
+    <div class="counts">
+      <div class="count p"><b id="cP">0</b>sampah plastik</div>
+      <div class="count n"><b id="cN">0</b>sampah nonplastik</div>
+    </div>
+    <ul class="items" id="items"></ul>
+    <p class="note" style="margin-top:.8rem">Hasil ini ilustrasi untuk prototipe, bukan keluaran model yang sudah diuji. Tidak ada klaim akurasi.</p>
+  </section>
+
+  <section class="card hidden" id="record" aria-labelledby="h4">
+    <h2 id="h4">4. Catat wilayah</h2>
+    <form id="form">
+      <label for="area">Nama wilayah / pantai</label>
+      <input type="text" id="area" maxlength="80" required placeholder="Contoh: Pantai Talise, Palu">
+      <label for="note">Catatan (opsional)</label>
+      <textarea id="note" rows="2" maxlength="200" placeholder="Contoh: dekat muara sungai, banyak sampah saat pasang"></textarea>
+      <div class="row">
+        <button type="button" class="ghost" id="geoBtn">Ambil koordinat saya</button>
+        <span class="note" id="geoOut">Koordinat belum diambil (opsional).</span>
+      </div>
+      <div class="row"><button type="submit" class="cta">Catat Wilayah</button></div>
+    </form>
+    <p class="note">Data hanya disimpan di browser perangkat ini (localStorage) dan tidak dikirim ke server. Koordinat memakai izin lokasi perangkatmu dan hanya diambil jika kamu menekan tombolnya.</p>
+  </section>
+
+  <section class="card" aria-labelledby="h5">
+    <h2 id="h5">Catatan wilayah</h2>
+    <div class="tw"><table>
+      <thead><tr><th>Waktu</th><th>Wilayah</th><th>Plastik</th><th>Nonplastik</th><th>Koordinat</th><th>Catatan</th><th></th></tr></thead>
+      <tbody id="log"></tbody>
+    </table></div>
+    <div class="empty" id="empty">Belum ada catatan. Selesaikan pemindaian, lalu catat wilayahnya.</div>
+    <div class="row">
+      <button class="ghost" id="csvBtn">Unduh CSV</button>
+      <button class="danger" id="clearBtn">Hapus semua</button>
+    </div>
+  </section>
+</main>
+<footer class="note">Prototipe simulasi untuk tugas Multimedia Interaktif. Foto latar (pantai.jpg) disediakan pengembang; sumber dan prompt dicantumkan di laporan. Kotak deteksi digambar manual, bukan hasil model.</footer>
+
+<script>
+(function(){
+  var W = 1408;
+  var OBJ = [
+    {n:"Botol plastik biru", t:"p", b:[157,522,98,48]},
+    {n:"Botol plastik bening", t:"p", b:[262,541,105,42]},
+    {n:"Botol plastik bening besar", t:"p", b:[470,563,123,52]},
+    {n:"Botol plastik tutup biru", t:"p", b:[548,641,135,42]},
+    {n:"Gelas plastik", t:"p", b:[255,634,55,47]},
+    {n:"Kemasan makanan", t:"p", b:[645,518,77,60]},
+    {n:"Kantong plastik", t:"p", b:[698,681,95,56]},
+    {n:"Jaring dan tali", t:"p", b:[735,480,290,140]},
+    {n:"Kaleng merah", t:"n", b:[893,627,75,40]},
+    {n:"Kaleng cokelat", t:"n", b:[983,669,80,44]},
+    {n:"Botol kaca cokelat", t:"n", b:[953,528,76,52]},
+    {n:"Sandal karet merah muda", t:"n", b:[405,714,103,36]},
+    {n:"Kayu hanyut", t:"n", b:[440,478,170,42]},
+    {n:"Kain", t:"n", b:[313,712,102,56]},
+    {n:"Kaleng kecil", t:"n", b:[710,441,38,22]}
+  ].sort(function(a,b){return a.b[0]-b.b[0];});
+  var COL = {p:"#F77F00", n:"#1f7a6f"};
+  var NS = "http://www.w3.org/2000/svg";
+  var $ = function(id){return document.getElementById(id);};
+  var boxesG = $("boxes"), scan = $("scan"), status = $("status");
+  var done = false, raf = null, coords = null;
+  var KEY = "pesisircerdas_catatan_v1";
+
+  // kotak deteksi
+  var els = OBJ.map(function(o){
+    var g = document.createElementNS(NS,"g"); g.setAttribute("class","box");
+    var x=o.b[0], y=o.b[1], w=o.b[2], h=o.b[3];
+    var r = document.createElementNS(NS,"rect");
+    r.setAttribute("class","f"); r.setAttribute("x",x); r.setAttribute("y",y);
+    r.setAttribute("width",w); r.setAttribute("height",h); r.setAttribute("stroke",COL[o.t]);
+    var lab = o.t==="p" ? "Plastik" : "Nonplastik";
+    var lw = o.t==="p" ? 92 : 126;
+    var bg = document.createElementNS(NS,"rect");
+    bg.setAttribute("x",x); bg.setAttribute("y",y-28); bg.setAttribute("width",lw); bg.setAttribute("height",28); bg.setAttribute("fill",COL[o.t]);
+    var tx = document.createElementNS(NS,"text");
+    tx.setAttribute("x",x+7); tx.setAttribute("y",y-8); tx.setAttribute("font-size","19"); tx.setAttribute("font-weight","700");
+    tx.setAttribute("font-family","sans-serif"); tx.setAttribute("fill", o.t==="p" ? "#1a1000" : "#fff");
+    tx.textContent = lab;
+    g.appendChild(r); g.appendChild(bg); g.appendChild(tx); boxesG.appendChild(g);
+    return g;
+  });
+
+  function setStep(n){
+    var li = $("steps").children;
+    for (var i=0;i<li.length;i++){ li[i].className = i<n ? "done" : (i===n ? "on" : ""); }
+  }
+
+  function reset(){
+    if (raf) cancelAnimationFrame(raf); raf = null;
+    els.forEach(function(g){g.classList.remove("on");});
+    scan.classList.add("hidden");
+    $("result").classList.add("hidden"); $("record").classList.add("hidden");
+    $("scanBtn").disabled = false; done = false;
+    status.textContent = "Tekan Pindai untuk memulai simulasi deteksi.";
+    setStep(0);
+  }
+
+  function finish(){
+    done = true; scan.classList.add("hidden");
+    var p = OBJ.filter(function(o){return o.t==="p";}), n = OBJ.filter(function(o){return o.t==="n";});
+    $("cP").textContent = p.length; $("cN").textContent = n.length;
+    var ul = $("items"); ul.innerHTML = "";
+    OBJ.forEach(function(o){
+      var li = document.createElement("li");
+      var d = document.createElement("span"); d.className = "dot " + o.t;
+      li.appendChild(d); li.appendChild(document.createTextNode(o.n + " (" + (o.t==="p" ? "plastik" : "nonplastik") + ")"));
+      ul.appendChild(li);
+    });
+    $("result").classList.remove("hidden"); $("record").classList.remove("hidden");
+    status.textContent = "Pemindaian selesai (simulasi). Catat wilayahnya di bawah.";
+    $("scanBtn").disabled = false;
+    setStep(3);
+    $("result").scrollIntoView({behavior:"smooth", block:"nearest"});
+  }
+
+  $("scanBtn").addEventListener("click", function(){
+    reset(); this.disabled = true; setStep(1);
+    status.textContent = "Memindai (simulasi)...";
+    var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduce){ els.forEach(function(g){g.classList.add("on");}); finish(); return; }
+    scan.classList.remove("hidden");
+    var t0 = null, dur = 3600;
+    function step(ts){
+      if (t0===null) t0 = ts;
+      var k = Math.min((ts-t0)/dur, 1), x = k*W;
+      scan.setAttribute("x", x);
+      OBJ.forEach(function(o,i){ if (x >= o.b[0] + o.b[2]/2) els[i].classList.add("on"); });
+      if (k<1){ raf = requestAnimationFrame(step); } else { setStep(2); setTimeout(finish, 500); }
+    }
+    raf = requestAnimationFrame(step);
+  });
+  $("resetBtn").addEventListener("click", reset);
+
+  // koordinat
+  $("geoBtn").addEventListener("click", function(){
+    var out = $("geoOut");
+    if (!navigator.geolocation){ out.textContent = "Perangkat ini tidak mendukung geolokasi."; return; }
+    out.textContent = "Mengambil koordinat...";
+    navigator.geolocation.getCurrentPosition(function(pos){
+      coords = {lat:+pos.coords.latitude.toFixed(5), lng:+pos.coords.longitude.toFixed(5)};
+      out.textContent = "Koordinat: " + coords.lat + ", " + coords.lng;
+    }, function(){
+      coords = null; out.textContent = "Koordinat tidak tersedia (izin ditolak atau gagal). Kamu tetap bisa mencatat tanpa koordinat.";
+    }, {timeout:10000});
+  });
+
+  // catatan (localStorage)
+  function load(){ try { return JSON.parse(localStorage.getItem(KEY)) || []; } catch(e){ return []; } }
+  function save(a){ try { localStorage.setItem(KEY, JSON.stringify(a)); } catch(e){ alert("Penyimpanan di browser tidak tersedia."); } }
+  function fmt(ts){ return new Date(ts).toLocaleString("id-ID",{dateStyle:"medium",timeStyle:"short"}); }
+  function cell(tr, text){ var td = document.createElement("td"); td.textContent = text; tr.appendChild(td); return td; }
+  function render(){
+    var a = load(), tb = $("log"); tb.innerHTML = "";
+    $("empty").classList.toggle("hidden", a.length>0);
+    a.slice().reverse().forEach(function(r){
+      var tr = document.createElement("tr");
+      cell(tr, fmt(r.ts)); cell(tr, r.area); cell(tr, r.p); cell(tr, r.n);
+      cell(tr, r.lat!=null ? r.lat + ", " + r.lng : "-"); cell(tr, r.note || "-");
+      var td = document.createElement("td"), b = document.createElement("button");
+      b.className = "danger"; b.textContent = "Hapus"; b.style.padding = ".3rem .7rem";
+      b.addEventListener("click", function(){ save(load().filter(function(x){return x.id!==r.id;})); render(); });
+      td.appendChild(b); tr.appendChild(td); tb.appendChild(tr);
+    });
+  }
+  $("form").addEventListener("submit", function(e){
+    e.preventDefault();
+    if (!done) return;
+    var area = $("area").value.trim(); if (!area) return;
+    var a = load();
+    a.push({id:Date.now()+"-"+Math.random().toString(36).slice(2,7), ts:Date.now(), area:area, note:$("note").value.trim(),
+      p:OBJ.filter(function(o){return o.t==="p";}).length, n:OBJ.filter(function(o){return o.t==="n";}).length,
+      lat: coords?coords.lat:null, lng: coords?coords.lng:null});
+    save(a); render();
+    $("form").reset(); coords = null; $("geoOut").textContent = "Koordinat belum diambil (opsional).";
+    status.textContent = "Wilayah \"" + area + "\" tercatat.";
+    $("log").scrollIntoView({behavior:"smooth", block:"center"});
+  });
+  $("clearBtn").addEventListener("click", function(){
+    if (confirm("Hapus semua catatan wilayah di perangkat ini?")){ save([]); render(); }
+  });
+  function csvCell(v){
+    v = String(v==null ? "" : v);
+    if (/^[=+\-@]/.test(v)) v = "'" + v;
+    return '"' + v.replace(/"/g,'""') + '"';
+  }
+  $("csvBtn").addEventListener("click", function(){
+    var a = load();
+    if (!a.length){ alert("Belum ada catatan untuk diunduh."); return; }
+    var rows = [["waktu","wilayah","plastik","nonplastik","lat","lng","catatan"]];
+    a.forEach(function(r){ rows.push([new Date(r.ts).toISOString(), r.area, r.p, r.n, r.lat, r.lng, r.note]); });
+    var csv = "\ufeff" + rows.map(function(r){return r.map(csvCell).join(",");}).join("\n");
+    var url = URL.createObjectURL(new Blob([csv],{type:"text/csv;charset=utf-8"}));
+    var l = document.createElement("a"); l.href = url; l.download = "catatan_wilayah_pesisircerdas.csv";
+    document.body.appendChild(l); l.click(); l.remove(); setTimeout(function(){URL.revokeObjectURL(url);},500);
+  });
+
+  render(); setStep(0);
+})();
+</script>
+</body>
+</html>
