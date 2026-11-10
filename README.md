@@ -2,12 +2,14 @@
 Prototipe web simulasi untuk tugas Multimedia Interaktif. 
 
 Alurnya:
-Foto pantai kotor (ilustrasi SVG) dengan sampah plastik dan nonplastik
-Pindai
+1. Foto pantai kotor (ilustrasi SVG) dengan sampah plastik dan nonplastik
 
-Terdeteksi: kotak oranye (plastik) dan hijau (nonplastik) beserta jumlahnya
+2. Pindai
 
-Catat wilayah: nama wilayah, catatan, dan koordinat opsional, disimpan di browser dan bisa diunduh sebagai CSV
+3. Terdeteksi: kotak oranye (plastik) dan hijau (nonplastik) beserta jumlahnya
+
+4. Catat wilayah: nama wilayah, catatan, dan koordinat opsional, disimpan di browser dan bisa diunduh sebagai CSV
+
 ## Batasan
 Ini simulasi. Tidak ada model deteksi sungguhan; kotak deteksi sudah ditentukan di kode.
 
